@@ -73,6 +73,7 @@ export const useMainStore = defineStore("main", {
       posts: {
         data: {} as ListProps<PostProps>,
         loadedColumns: [] as String[],
+        total: 0,
       },
       loading: false,
       error: { status: false } as ErrorProps,
@@ -120,12 +121,25 @@ export const useMainStore = defineStore("main", {
         this.columns.data[data.data._id] = data.data;
       }
     },
-    async fetchPosts(cid: string) {
-      if (!this.posts.loadedColumns.includes(cid)) {
-        const { data } = await axios.get(`/columns/${cid}/posts`);
-        this.posts.data = { ...this.posts.data, ...arrToObj(data.data.list) };
-        this.posts.loadedColumns.push(cid);
-      }
+    async fetchPosts(
+      cid: string,
+      params: loadParams = { currentPage: 1, pageSize: 3 }
+    ) {
+      const { currentPage, pageSize } = params;
+      const { data } = await axios.get(
+        `columns/${cid}/posts?currentPage=${currentPage}&pageSize=${pageSize}`
+      );
+      const { list, count } = data.data;
+      this.posts = {
+        data: { ...this.posts.data, ...arrToObj(list) },
+        total: count,
+        loadedColumns: [...this.posts.loadedColumns, cid],
+      };
+      // if (!this.posts.loadedColumns.includes(cid)) {
+      //   const { data } = await axios.get(`/columns/${cid}/posts`);
+      //   this.posts.data = { ...this.posts.data, ...arrToObj(data.data.list) };
+      //   this.posts.loadedColumns.push(cid);
+      // }
     },
     async fetchPost(pid: string) {
       const currentPost = this.posts.data[pid];

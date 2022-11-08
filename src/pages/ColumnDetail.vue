@@ -17,6 +17,13 @@
       </div>
     </div>
     <post-list :lists="selectedPosts"></post-list>
+    <button
+      class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25"
+      @click="loadMorePage"
+      v-if="!isLastPage"
+    >
+      Load More😀
+    </button>
   </div>
 </template>
 
@@ -26,17 +33,25 @@ import { useRoute } from "vue-router";
 import { useMainStore, ColumnProps } from "./../store";
 import PostList from "./../components/PostList.vue";
 import { addColumnAvatar } from "../helper";
+import useLoadMore from "../hooks/useLoadMore";
 export default defineComponent({
   components: { PostList },
   setup() {
     const route = useRoute();
     const store = useMainStore();
 
-    let selectedId = route.params.id.toString();
+    const selectedId = ref(route.params.id.toString());
+    const total = computed(() => store.posts.total);
+    const { loadMorePage, isLastPage } = useLoadMore(
+      "posts",
+      total,
+      { currentPage: 2, pageSize: 3 },
+      selectedId.value
+    );
 
     onMounted(() => {
-      store.fetchColumn(selectedId);
-      store.fetchPosts(selectedId);
+      store.fetchColumn(selectedId.value);
+      store.fetchPosts(selectedId.value);
     });
 
     watch(
@@ -47,13 +62,13 @@ export default defineComponent({
         if (jumpId && column && jumpId === column) {
           store.fetchColumn(jumpId);
           store.fetchPosts(jumpId);
-          selectedId = toParams.id.toString();
+          selectedId.value = toParams.id.toString();
         }
       }
     );
 
     const column = computed(() => {
-      const selectColumn = store.getColumnById(selectedId) as
+      const selectColumn = store.getColumnById(selectedId.value) as
         | ColumnProps
         | undefined;
       if (selectColumn) {
@@ -62,8 +77,8 @@ export default defineComponent({
       return selectColumn;
     });
 
-    const selectedPosts = computed(() => store.getPostsByCid(selectedId));
-    return { column, selectedPosts };
+    const selectedPosts = computed(() => store.getPostsByCid(selectedId.value));
+    return { column, selectedPosts, loadMorePage, isLastPage };
   },
 });
 </script>

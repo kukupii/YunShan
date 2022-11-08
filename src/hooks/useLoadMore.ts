@@ -9,7 +9,8 @@ export interface loadParams {
 const useLoadMore = (
   useFor: string,
   total: ComputedRef<number>,
-  params: loadParams = { currentPage: 2, pageSize: 5 }
+  params: loadParams = { currentPage: 2, pageSize: 5 },
+  cid?: string
 ) => {
   const store = useMainStore();
   const currentPage = ref(params.currentPage);
@@ -22,6 +23,14 @@ const useLoadMore = (
   if (useFor === "columns") {
     loadMorePage = () => {
       store.fetchColumns(requestParams.value).then(() => {
+        currentPage.value++;
+        console.log(requestParams);
+      });
+    };
+  }
+  if (useFor === "posts" && cid) {
+    loadMorePage = () => {
+      store.fetchPosts(cid, requestParams.value).then(() => {
         currentPage.value++;
         console.log(requestParams);
       });
