@@ -18,26 +18,41 @@
       </div>
     </section>
     <h4 class="font-weight-bold text-center">发现精彩</h4>
-
     <div>
       <column-list></column-list>
     </div>
+    <button
+      class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25"
+      @click="loadMorePage"
+      v-if="!isLastPage"
+    >
+      Load More😀
+    </button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted, computed } from "vue";
 import ColumnList from "./../components/ColumnList.vue";
 import useMainStore from "./../store";
+import useLoadMore from "../hooks/useLoadMore";
 
 export default defineComponent({
   name: "Home",
   components: { ColumnList },
   setup() {
     const store = useMainStore();
+    const total = computed(() => store.columns.total);
     onMounted(() => {
       store.fetchColumns();
     });
+
+    const { loadMorePage, isLastPage } = useLoadMore("columns", total, {
+      currentPage: 2,
+      pageSize: 3,
+    });
+
+    return { loadMorePage, isLastPage };
   },
 });
 </script>

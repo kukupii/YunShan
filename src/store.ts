@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { arrToObj, objToArr } from "./helper";
+import { loadParams } from "./hooks/useLoadMore";
 
 export interface PostProps {
   _id?: string;
@@ -64,7 +65,11 @@ export const useMainStore = defineStore("main", {
       currentUser: {
         isLogin: false,
       } as UserProps,
-      columns: { data: {} as ListProps<ColumnProps>, isLoaded: false },
+      columns: {
+        data: {} as ListProps<ColumnProps>,
+        isLoaded: false,
+        total: 0,
+      },
       posts: {
         data: {} as ListProps<PostProps>,
         loadedColumns: [] as String[],
@@ -90,12 +95,24 @@ export const useMainStore = defineStore("main", {
       this.posts.data[data._id] = data;
       return data;
     },
-    async fetchColumns() {
-      if (!this.columns.isLoaded) {
-        const { data } = await axios.get("/columns");
-        this.columns.data = arrToObj(data.data.list);
-        this.columns.isLoaded = true;
-      }
+    async fetchColumns(params: loadParams = { currentPage: 1, pageSize: 3 }) {
+      const { currentPage, pageSize } = params;
+      // if (!this.columns.isLoaded) {
+      //   const { data } = await axios.get("/columns");
+      //   this.columns.data = arrToObj(data.data.list);
+      //   this.columns.isLoaded = true;
+      // }
+      const { data } = await axios.get(
+        `/columns?currentPage=${currentPage}&pageSize=${pageSize}`
+      );
+      const { list, count } = data.data;
+      this.columns = {
+        data: { ...this.columns.data, ...arrToObj(list) },
+        isLoaded: true,
+        total: count,
+      };
+      console.log(params);
+      console.log(this.columns);
     },
     async fetchColumn(cid: string) {
       if (!this.columns.data[cid]) {
@@ -111,10 +128,13 @@ export const useMainStore = defineStore("main", {
       }
     },
     async fetchPost(pid: string) {
-      if (!this.posts.data[pid]) {
+      const currentPost = this.posts.data[pid];
+      if (!currentPost || !currentPost.content) {
         const { data } = await axios.get(`/posts/${pid}`);
         this.posts.data[data.data._id] = data.data;
         return data;
+      } else {
+        return Promise.resolve({ data: currentPost });
       }
     },
     async updatePost(pid: string, body: PostProps) {

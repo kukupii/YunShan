@@ -22,6 +22,7 @@ export const beforeUploadCheck = (file: File, condition: CheckCondition) => {
 
 import { ColumnProps, UserProps } from "./store";
 import imgUrl from "./assets/avatar.jpg";
+import columnUrl from "./assets/column.jpg";
 export function generateFitUrl(
   column: ColumnProps,
   width: number,
@@ -48,9 +49,7 @@ export function addColumnAvatar(
   } else {
     const parseCol = data as ColumnProps;
     data.avatar = {
-      fitUrl: require(parseCol.title
-        ? "@/assets/column.jpg"
-        : "@/assets/avatar.jpg"),
+      fitUrl: parseCol.title ? imgUrl : columnUrl,
     };
   }
 }
