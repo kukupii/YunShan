@@ -29,19 +29,19 @@ export interface AvatarProps {
 
 export interface ColumnProps {
   _id?: string;
-  avatar?: AvatarProps;
+  avatar?: AvatarProps | string;
   title?: string;
   description?: string;
 }
 
 export interface UserProps {
-  isLogin: boolean;
+  isLogin?: boolean;
   nickName?: string;
   _id?: string;
   column?: string;
   email?: string;
   description?: string;
-  avatar?: AvatarProps;
+  avatar?: AvatarProps | string;
 }
 
 export interface LoginProps {
@@ -67,13 +67,15 @@ export const useMainStore = defineStore("main", {
       } as UserProps,
       columns: {
         data: {} as ListProps<ColumnProps>,
-        isLoaded: false,
+        currentPage: 0,
         total: 0,
       },
       posts: {
         data: {} as ListProps<PostProps>,
-        loadedColumns: [] as String[],
-        total: 0,
+        loadedColumns: {} as ListProps<{
+          total?: 0;
+          currentPage?: 1;
+        }>,
       },
       loading: false,
       error: { status: false } as ErrorProps,
@@ -89,6 +91,9 @@ export const useMainStore = defineStore("main", {
     getColumns: (state) => {
       return objToArr(state.columns.data);
     },
+    getUserLink: (state) => {
+      return "/user/" + state.currentUser._id;
+    },
   },
   actions: {
     async addNewPost(post: PostProps) {
@@ -98,22 +103,18 @@ export const useMainStore = defineStore("main", {
     },
     async fetchColumns(params: loadParams = { currentPage: 1, pageSize: 3 }) {
       const { currentPage, pageSize } = params;
-      // if (!this.columns.isLoaded) {
-      //   const { data } = await axios.get("/columns");
-      //   this.columns.data = arrToObj(data.data.list);
-      //   this.columns.isLoaded = true;
-      // }
-      const { data } = await axios.get(
-        `/columns?currentPage=${currentPage}&pageSize=${pageSize}`
-      );
-      const { list, count } = data.data;
-      this.columns = {
-        data: { ...this.columns.data, ...arrToObj(list) },
-        isLoaded: true,
-        total: count,
-      };
-      console.log(params);
-      console.log(this.columns);
+      if (this.columns.currentPage < currentPage) {
+        const { data } = await axios.get(
+          `/columns?currentPage=${currentPage}&pageSize=${pageSize}`
+        );
+        const { list, count } = data.data;
+        const currentPageP = data.data.currentPage;
+        this.columns = {
+          data: { ...this.columns.data, ...arrToObj(list) },
+          currentPage: currentPageP * 1,
+          total: count,
+        };
+      }
     },
     async fetchColumn(cid: string) {
       if (!this.columns.data[cid]) {
@@ -126,20 +127,25 @@ export const useMainStore = defineStore("main", {
       params: loadParams = { currentPage: 1, pageSize: 3 }
     ) {
       const { currentPage, pageSize } = params;
-      const { data } = await axios.get(
-        `columns/${cid}/posts?currentPage=${currentPage}&pageSize=${pageSize}`
-      );
-      const { list, count } = data.data;
-      this.posts = {
-        data: { ...this.posts.data, ...arrToObj(list) },
-        total: count,
-        loadedColumns: [...this.posts.loadedColumns, cid],
-      };
-      // if (!this.posts.loadedColumns.includes(cid)) {
-      //   const { data } = await axios.get(`/columns/${cid}/posts`);
-      //   this.posts.data = { ...this.posts.data, ...arrToObj(data.data.list) };
-      //   this.posts.loadedColumns.push(cid);
-      // }
+      if (
+        !this.posts.loadedColumns[cid] ||
+        (this.posts.loadedColumns[cid].currentPage || 1) < currentPage
+      ) {
+        const { data } = await axios.get(
+          `columns/${cid}/posts?currentPage=${currentPage}&pageSize=${pageSize}`
+        );
+        const { list, count } = data.data;
+        const currentPageP = data.data.currentPage;
+        this.posts = {
+          data: { ...this.posts.data, ...arrToObj(list) },
+          loadedColumns: {
+            ...this.posts.loadedColumns,
+            ...arrToObj([
+              { _id: cid, total: count, currentPage: currentPageP },
+            ]),
+          },
+        };
+      }
     },
     async fetchPost(pid: string) {
       const currentPost = this.posts.data[pid];
@@ -181,6 +187,18 @@ export const useMainStore = defineStore("main", {
         const { data } = await axios.get("/user/current");
         this.currentUser = { isLogin: true, ...data.data };
       }
+    },
+    async updateUserInfo(id: string, payload: UserProps) {
+      const { data } = await axios.patch(`/user/${id}`, payload);
+      this.currentUser = { ...this.currentUser, ...data.data };
+      console.log(this.currentUser);
+      return data;
+    },
+    async updateColumnInfo(cid: string, payload: ColumnProps) {
+      const { data } = await axios.patch(`/columns/${cid}`, payload);
+      this.columns.data[cid] = data.data;
+      console.log(this.columns.data[cid]);
+      return data;
     },
     setError(status: boolean, msg: string) {
       this.error = { status: status, message: msg };

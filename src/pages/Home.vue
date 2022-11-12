@@ -1,24 +1,32 @@
 <template>
-  <div class="home-page">
-    <section class="py-5 text-center container">
-      <div class="row py-lg-5">
-        <div class="col-lg-6 col-md-8 mx-auto">
-          <img
-            src="../assets/img/hlyjd38ej8061.jpg"
-            alt="callout"
-            class="w-50"
-          />
-          <h2 class="font-weight-light">随心写作，自由表达</h2>
-          <p>
-            <router-link to="/create" class="btn btn-primary my-2"
-              >开始写文章</router-link
-            >
-          </p>
+  <div class="home-page d-flex flex-column">
+    <div
+      class="container-fluid text-center bg-image mb-3 w-100"
+      style="
+        background-image: url('https://mdbootstrap.com/img/Photos/Horizontal/Nature/full%20page/img(11).jpg');
+        height: 460px;
+        background-position: 10% 70%;
+      "
+    >
+      <div class="d-flex justify-content-center align-items-center h-100 w-100">
+        <div class="text-white">
+          <h1 class="mb-3">Cloud Mountain</h1>
+          <h4 class="mb-3">
+            Write at your own pace & express yourself freely.
+          </h4>
+          <router-link
+            class="btn btn-outline-light btn-lg"
+            href="#!"
+            role="button"
+            to="/create"
+            >Start writing now!</router-link
+          >
         </div>
       </div>
-    </section>
-    <h4 class="font-weight-bold text-center">发现精彩</h4>
-    <div>
+    </div>
+
+    <h4 class="font-weight-bold text-center mb-3">发现精彩</h4>
+    <div class="container">
       <column-list></column-list>
     </div>
     <button
@@ -43,12 +51,13 @@ export default defineComponent({
   setup() {
     const store = useMainStore();
     const total = computed(() => store.columns.total);
+    const currentPage = computed(() => store.columns.currentPage);
     onMounted(() => {
       store.fetchColumns();
     });
 
     const { loadMorePage, isLastPage } = useLoadMore("columns", total, {
-      currentPage: 2,
+      currentPage: currentPage.value ? currentPage.value : 2,
       pageSize: 3,
     });
 

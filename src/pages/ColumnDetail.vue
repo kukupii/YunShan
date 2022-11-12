@@ -1,5 +1,5 @@
 <template>
-  <div class="column-detail-page w-75 mx-auto">
+  <div class="column-detail-page w-75 mx-auto container">
     <div
       class="column-info row mb-4 border-bottom pb-4 align-items-center"
       v-if="column"
@@ -41,11 +41,17 @@ export default defineComponent({
     const store = useMainStore();
 
     const selectedId = ref(route.params.id.toString());
-    const total = computed(() => store.posts.total);
+    const total = computed(
+      () => store.posts.loadedColumns[selectedId.value]?.total || 0
+    );
+    const currentPage = computed(
+      () => store.posts.loadedColumns[selectedId.value]?.currentPage
+    );
+
     const { loadMorePage, isLastPage } = useLoadMore(
       "posts",
       total,
-      { currentPage: 2, pageSize: 3 },
+      { currentPage: currentPage.value ? currentPage.value : 2, pageSize: 3 },
       selectedId.value
     );
 

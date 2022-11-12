@@ -4,7 +4,7 @@
       <div class="card h-100 shadow-sm">
         <div class="card-body text-center">
           <img
-            :src="column.avatar && column.avatar.url"
+            :src="column.avatar && column.avatar.fitUrl"
             :alt="column.title"
             class="rounded-circle border border-light my-3"
           />
@@ -23,25 +23,25 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useMainStore } from "./../store";
+import { AvatarProps, useMainStore } from "./../store";
 import imgUrl from "../assets/avatar.jpg";
+import { generateFitUrl } from "../helper";
 
 export default defineComponent({
   setup() {
     const store = useMainStore();
+
     const columnList = computed(() => {
       return store.getColumns.map((col) => {
         if (!col.avatar) {
           col.avatar = { url: imgUrl };
-        } else {
-          col.avatar = {
-            ...col,
-            url: col.avatar.url + "?x-oss-process=image/resize,m_pad,h_50,w_50",
-          };
+        } else if (col.avatar && typeof col.avatar !== "string") {
+          generateFitUrl(col.avatar, 50, 50);
         }
         return col;
       });
     });
+
     return { columnList };
   },
 });

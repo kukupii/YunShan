@@ -67,7 +67,7 @@ export default defineComponent({
         store.fetchPost(selectedId).then((resp) => {
           const { data } = resp;
           post.value = data;
-          console.log(data);
+          
           if (post.value?.image && typeof post.value.image !== "string") {
             imgUrl.value = post.value.image.url || "";
           }

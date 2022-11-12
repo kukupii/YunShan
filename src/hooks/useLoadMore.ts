@@ -14,17 +14,18 @@ const useLoadMore = (
 ) => {
   const store = useMainStore();
   const currentPage = ref(params.currentPage);
-  const requestParams = computed(() => ({
-    currentPage: currentPage.value,
-    pageSize: params.pageSize,
-  }));
+  const requestParams = computed(() => {
+    return {
+      ...params,
+      currentPage: currentPage.value + 1,
+    };
+  });
 
   let loadMorePage;
   if (useFor === "columns") {
     loadMorePage = () => {
       store.fetchColumns(requestParams.value).then(() => {
         currentPage.value++;
-        console.log(requestParams);
       });
     };
   }
@@ -32,13 +33,12 @@ const useLoadMore = (
     loadMorePage = () => {
       store.fetchPosts(cid, requestParams.value).then(() => {
         currentPage.value++;
-        console.log(requestParams);
       });
     };
   }
 
   const isLastPage = computed(() => {
-    return Math.ceil(total.value / params.pageSize) < currentPage.value;
+    return Math.ceil(total.value / params.pageSize) === currentPage.value;
   });
 
   return { loadMorePage, isLastPage };

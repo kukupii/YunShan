@@ -12,7 +12,11 @@
             class="col-3"
             v-if="post.image && typeof post.image !== 'string'"
           >
-            <img :src="post.image.url" :alt="post.title" class="rounded-lg" />
+            <img
+              :src="post.image.fitUrl"
+              :alt="post.title"
+              class="rounded-lg"
+            />
           </div>
           <p :class="{ 'col-9': post.image }">{{ post.excerpt }}</p>
         </div>
@@ -25,6 +29,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed } from "vue";
 import { PostProps } from "./../store";
+import { generateFitUrl } from "../helper";
 export default defineComponent({
   props: {
     lists: {
@@ -36,17 +41,8 @@ export default defineComponent({
     const postList = computed(() => {
       return props.lists.map((li) => {
         if (li.image) {
-          let url = "";
           if (li.image && typeof li.image !== "string") {
-            url =
-              li.image.url +
-              "?x-oss-process=image/resize,m_pad,h_100,w_200,color_FFFFFD";
-            li.image = {
-              ...li.image,
-              url,
-              // li.image.url +
-              // "?x-oss-process=image/resize,m_pad,h_100,w_200,color_FFFFFD",
-            };
+            generateFitUrl(li.image, 200, 100);
           }
         }
         return li;

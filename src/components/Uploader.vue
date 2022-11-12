@@ -93,6 +93,7 @@ export default defineComponent({
           .then((resp) => {
             uploadStatus.value = "success";
             uploadData.value = resp.data;
+            console.log(resp.data);
             context.emit("file-uploaded", resp.data);
           })
           .catch((e) => {

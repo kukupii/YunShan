@@ -1,5 +1,5 @@
 <template>
-  <div class="create-post-page">
+  <div class="create-post-page container w-75 mx-auto">
     <div class="ability">
       <h1>
         {{ isEditMode ? "Edit your post!" : "Create a new post!" }}

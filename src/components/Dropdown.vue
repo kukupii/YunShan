@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown">
     <a
-      class="btn btn-outline-light my-2 dropdown-toggle"
+      class="btn btn-outline-dark my-2 dropdown-toggle"
       href="#"
       role="button"
       data-bs-toggle="dropdown"
@@ -20,8 +20,10 @@
           >新建文章</router-link
         ></DropdownItem
       >
-      <DropdownItem disabled
-        ><a class="dropdown-item" href="#">编辑资料</a></DropdownItem
+      <DropdownItem
+        ><router-link class="dropdown-item" :to="currentUserInfoLink"
+          >编辑资料</router-link
+        ></DropdownItem
       >
       <DropdownItem
         ><a class="dropdown-item" @click="logout">退出登陆</a></DropdownItem
@@ -34,7 +36,6 @@
 import { defineComponent, computed } from "vue";
 import DropdownItem from "./DropdownItem.vue";
 import { useMainStore } from "../store";
-import { userInfo } from "os";
 
 export default defineComponent({
   components: { DropdownItem },
@@ -50,7 +51,11 @@ export default defineComponent({
       const { column } = store.currentUser;
       return `/column/${column}`;
     });
-    return { logout, currentUserColumnLink };
+
+    const currentUserInfoLink = computed(() => {
+      return store.getUserLink;
+    });
+    return { logout, currentUserColumnLink, currentUserInfoLink };
   },
 });
 </script>

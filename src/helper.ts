@@ -20,22 +20,19 @@ export const beforeUploadCheck = (file: File, condition: CheckCondition) => {
   };
 };
 
-import { ColumnProps, UserProps } from "./store";
+import { ColumnProps, UserProps, AvatarProps } from "./store";
 import imgUrl from "./assets/avatar.jpg";
 import columnUrl from "./assets/column.jpg";
 export function generateFitUrl(
-  column: ColumnProps,
+  data: AvatarProps,
   width: number,
   height: number
 ) {
-  if (column.avatar) {
-    column.avatar.fitUrl =
-      column.avatar.url +
-      `?x-oss-process=image/resize,m_pad,h_${height},w_${width}`;
+  if (data.url) {
+    data.fitUrl =
+      data.url + `?x-oss-process=image/resize,m_pad,h_${height},w_${width}`;
   } else {
-    column.avatar = {
-      fitUrl: `${imgUrl}?x-oss-process=image/resize,m_pad,h_100,w_200`,
-    };
+    data.fitUrl = `${imgUrl}?x-oss-process=image/resize,m_pad,h_100,w_200`;
   }
 }
 
@@ -45,7 +42,7 @@ export function addColumnAvatar(
   height: number
 ) {
   if (data.avatar) {
-    generateFitUrl(data.avatar, width, height);
+    generateFitUrl(data.avatar as AvatarProps, width, height);
   } else {
     const parseCol = data as ColumnProps;
     data.avatar = {

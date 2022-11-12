@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <validate-form @submit-form="handleSubmit">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>

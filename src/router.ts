@@ -6,6 +6,9 @@ import Createpost from "./pages/Createpost.vue";
 import useMainStore from "./store";
 import Register from "./pages/Register.vue";
 import PostDetail from "./pages/PostDetail.vue";
+import UserEdit from "./pages/UserEdit.vue";
+import UserInfo from "./components/UserInfo.vue";
+import ColumnInfo from "./components/ColumnInfo.vue";
 
 const routerHistory = createWebHistory();
 const router = createRouter({
@@ -31,6 +34,24 @@ const router = createRouter({
       meta: { needAuthendicated: true },
     },
     { path: "/post/:id", component: PostDetail, name: "PostDetail" },
+    {
+      path: "/user/:id",
+      component: UserEdit,
+      name: "UserEdit",
+      meta: { needAuthendicated: true },
+      children: [
+        {
+          path: "",
+          name: "user",
+          component: UserInfo,
+        },
+        {
+          path: "columnInfo",
+          name: "columnInfo",
+          component: ColumnInfo,
+        },
+      ],
+    },
   ],
 });
 

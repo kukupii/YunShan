@@ -20,6 +20,7 @@
 import { defineComponent, PropType, ref } from "vue";
 import { UserProps } from "../store";
 import defaultAvatar from "../assets/avatar.jpg";
+import { generateFitUrl } from "../helper";
 export default defineComponent({
   props: {
     user: {
@@ -38,7 +39,10 @@ export default defineComponent({
       props.user.avatar &&
       typeof props.user.avatar !== "string"
     ) {
-      avatarImg.value = props.user.avatar?.url || "";
+      generateFitUrl(props.user.avatar, 200, 200);
+      avatarImg.value = props.user.avatar?.fitUrl || "";
+    } else if (typeof props.user.avatar === "string") {
+      avatarImg.value = props.user.avatar;
     } else {
       avatarImg.value = defaultAvatar;
     }
