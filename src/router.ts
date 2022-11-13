@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "./pages/Home.vue";
 import Login from "./pages/Login.vue";
 import ColumnDetail from "./pages/ColumnDetail.vue";
-import Createpost from "./pages/Createpost.vue";
+import Createpost from "./pages/CreatePost.vue";
 import useMainStore from "./store";
 import Register from "./pages/Register.vue";
 import PostDetail from "./pages/PostDetail.vue";
