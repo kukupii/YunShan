@@ -24,7 +24,11 @@ interface CallbackProps {
   formName: string;
 }
 
-export const emitter = mitt();
+type Events = {
+  "item-created": CallbackProps;
+};
+
+export const emitter = mitt<Events>();
 
 export default defineComponent({
   emits: ["submit-form"],
@@ -61,9 +65,9 @@ export default defineComponent({
       clearStatusArr.forEach((c) => c());
     };
 
-    emitter.on("item-created", <() => void>callback);
+    emitter.on("item-created", callback);
     onUnmounted(() => {
-      emitter.off("item-created", <() => void>callback);
+      emitter.off("item-created", callback);
       validateFunction = [];
       clearFuncArr = [];
     });

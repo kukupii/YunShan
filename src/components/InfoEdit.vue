@@ -3,9 +3,7 @@
     <h2 class="mt-3">Edit {{ editObject }} Info:)</h2>
     <div class="avatar text-center">
       <img
-        :src="
-          values.avatarUrl + '?x-oss-process=image/resize,m_fill,h_200,w_200'
-        "
+        :src="values.avatarUrl"
         class="rounded-circle"
         style="width: 150px"
         alt="Avatar"
@@ -52,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted, PropType } from "vue";
+import { defineComponent, reactive, onMounted, PropType, Prop } from "vue";
 import ValidateForm from "./ValidateForm.vue";
 import ValidateInput, { RulesProp } from "./ValidateInput.vue";
 import Uploader from "./Uploader.vue";
@@ -68,6 +66,11 @@ import {
 import avatarUrl from "../assets/avatar.jpg";
 
 type objectType = "user" | "column";
+export interface originDataType {
+  name: string;
+  description: string;
+  avatarUrl: string;
+}
 
 export default defineComponent({
   props: {
@@ -78,6 +81,10 @@ export default defineComponent({
     },
     id: {
       type: String,
+      required: true,
+    },
+    originData: {
+      type: Object as PropType<originDataType>,
       required: true,
     },
   },
@@ -93,25 +100,9 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      let name, desc, avatarV;
-      if (props.editObject === "user") {
-        const { nickName, description, avatar } = store.currentUser;
-        name = nickName;
-        desc = description;
-        avatarV = avatar;
-      } else if (props.editObject === "column" && props.id) {
-        const { title, description, avatar } = store.getColumnById(props.id);
-        name = title;
-        desc = description;
-        avatarV = avatar;
-      }
-      values.nameVal = name || "";
-      values.profileVal = desc || "";
-      if (typeof avatarV !== "string") {
-        values.avatarUrl = avatarV?.url || avatarV?.fitUrl || avatarUrl;
-      } else {
-        values.avatarUrl = avatarV || avatarUrl;
-      }
+      values.nameVal = props.originData.name;
+      values.profileVal = props.originData.description;
+      values.avatarUrl = props.originData.avatarUrl;
     });
 
     const nameRules: RulesProp = [

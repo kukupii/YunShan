@@ -3,11 +3,13 @@
     <div v-for="column in columnList" :key="column._id" class="col-4 mb-4">
       <div class="card h-100 shadow-sm">
         <div class="card-body text-center">
-          <img
-            :src="column.avatar && column.avatar.fitUrl"
-            :alt="column.title"
-            class="rounded-circle border border-light my-3"
-          />
+          <div v-if="typeof column.avatar !== 'string'">
+            <img
+              :src="column.avatar && column.avatar.fitUrl"
+              :alt="column.title"
+              class="rounded-circle border border-light my-3"
+            />
+          </div>
           <h5 class="card-title">{{ column.title }}</h5>
           <p class="card-text text-left">{{ column.description }}</p>
           <router-link
@@ -23,9 +25,8 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { AvatarProps, useMainStore } from "./../store";
-import imgUrl from "../assets/avatar.jpg";
-import { generateFitUrl } from "../helper";
+import { useMainStore } from "./../store";
+import { addColumnAvatar } from "../helper";
 
 export default defineComponent({
   setup() {
@@ -33,10 +34,10 @@ export default defineComponent({
 
     const columnList = computed(() => {
       return store.getColumns.map((col) => {
-        if (!col.avatar) {
-          col.avatar = { url: imgUrl };
-        } else if (col.avatar && typeof col.avatar !== "string") {
-          generateFitUrl(col.avatar, 50, 50);
+        if (col.avatar) {
+          if (col.avatar && typeof col.avatar !== "string") {
+            addColumnAvatar(col, 50, 50);
+          }
         }
         return col;
       });

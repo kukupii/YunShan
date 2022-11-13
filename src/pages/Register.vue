@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container w-75 mx-auto">
     <validate-form @submit-form="handleSubmit">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
@@ -35,6 +35,11 @@
           placeholder="Input repeated password here"
           type="password"
         ></ValidateInput>
+      </div>
+      <div class="form-text mb-3">
+        <router-link to="/login"
+          >Already have a account? Login now!</router-link
+        >
       </div>
       <template #submit>
         <button type="submit" class="btn btn-primary">Signup</button>

@@ -6,7 +6,7 @@
     >
       <div class="col-3 text-center">
         <img
-          :src="column.avatar && column.avatar.fitUrl"
+          :src="colAvaUrl"
           :alt="column.title"
           class="rounded-circle border w-50"
         />
@@ -77,14 +77,20 @@ export default defineComponent({
       const selectColumn = store.getColumnById(selectedId.value) as
         | ColumnProps
         | undefined;
-      if (selectColumn) {
+      if (selectColumn && typeof selectColumn.avatar !== "string") {
         addColumnAvatar(selectColumn, 100, 100);
       }
       return selectColumn;
     });
 
+    const colAvaUrl = computed(() => {
+      if (column.value && typeof column.value.avatar !== "string") {
+        return column.value.avatar?.fitUrl;
+      }
+    });
+
     const selectedPosts = computed(() => store.getPostsByCid(selectedId.value));
-    return { column, selectedPosts, loadMorePage, isLastPage };
+    return { column, selectedPosts, loadMorePage, isLastPage, colAvaUrl };
   },
 });
 </script>

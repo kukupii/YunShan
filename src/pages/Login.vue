@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container w-75 mx-auto">
     <validate-form @submit-form="handleSubmit" ref="loginForm">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>

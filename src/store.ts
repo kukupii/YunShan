@@ -120,6 +120,7 @@ export const useMainStore = defineStore("main", {
       if (!this.columns.data[cid]) {
         const { data } = await axios.get(`/columns/${cid}`);
         this.columns.data[data.data._id] = data.data;
+        return data;
       }
     },
     async fetchPosts(
