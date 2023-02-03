@@ -19,11 +19,11 @@ axios.defaults.baseURL = "http://apis.imooc.com/api/";
 axios.interceptors.request.use((config) => {
   store.setError(false, "");
   store.setLoading(true);
-  config.params = { ...config.params, icode: "04817B59C1498C51" };
+  config.params = { ...config.params, icode: "AD5DA945B788E021" };
   if (config.data instanceof FormData) {
-    config.data.append("icode", "04817B59C1498C51");
+    config.data.append("icode", "AD5DA945B788E021");
   } else {
-    config.data = { ...config.data, icode: "04817B59C1498C51" };
+    config.data = { ...config.data, icode: "AD5DA945B788E021" };
   }
   return config;
 });
